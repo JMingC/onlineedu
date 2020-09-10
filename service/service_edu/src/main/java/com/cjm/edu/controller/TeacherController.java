@@ -22,7 +22,8 @@ import java.util.List;
  * @since 2020-09-07
  */
 @RestController
-@RequestMapping("/edu/teacher")
+@RequestMapping("/eduservice/teacher")
+@CrossOrigin
 public class TeacherController {
     @Autowired
     private TeacherService teacherService;
@@ -47,7 +48,6 @@ public class TeacherController {
         System.out.println(current + " " + limit);
         Page<Teacher> page = new Page<>(current,limit);
 
-        int i = 10/0;
         teacherService.page(page,null);
         System.out.println("page:"  + page.toString());
         long total = page.getTotal();
@@ -85,9 +85,10 @@ public class TeacherController {
         }
     }
 
-    @GetMapping("pageTeacherCondition/{current}/{id}")
+    @PostMapping("pageTeacherCondition/{current}/{limit}")
     public Result pageTeacherCondition(@PathVariable long current, @PathVariable long limit,
                                        @RequestBody(required = false) TeacherQuery teacherQuery){
+        System.out.println("pageTeacherCondition");
         Page<Teacher> page = new Page<>(current,limit);
         //构建条件
         QueryWrapper<Teacher> wrapper = new QueryWrapper<>();
@@ -112,7 +113,8 @@ public class TeacherController {
         }
 
         //执行
-        teacherService.page(page);
+        wrapper.orderByDesc("gmt_create");
+        teacherService.page(page,wrapper);
         long total = page.getTotal();
         List<Teacher> list = page.getRecords();
 
